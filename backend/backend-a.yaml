@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-a
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-a
+  template:
+    metadata:
+      labels:
+        app: backend-a
+    spec:
+      containers:
+        - image: asia-northeast1-docker.pkg.dev/kzs-sandbox/toybox/mc-backend:v1
+          imagePullPolicy: Always
+          name: backend-a
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: VERSION
+              value: "v1"
+            - name: KIND
+              value: "backend-a"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-a
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: backend-a
+  type: ClusterIP
+  clusterIP: None
+---

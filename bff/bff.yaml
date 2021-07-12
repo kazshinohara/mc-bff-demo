@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bff
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bff
+  template:
+    metadata:
+      labels:
+        app: bff
+    spec:
+      containers:
+        - image: asia-northeast1-docker.pkg.dev/kzs-sandbox/toybox/mc-bff:v1
+          imagePullPolicy: Always
+          name: bff
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: KIND
+              value: "bff"
+            - name: VERSION
+              value: "v1"
+            - name: BE_A
+              value: "http://backend-a.default.svc.cluster-a:8080/"
+            - name: BE_B
+              value: "http://backend-b.default.svc.cluster-b:8080/"
+            - name: BE_C
+              value: "http://backend-c.default.svc.cluster-c:8080/"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bff
+spec:
+  ports:
+    - port: 8080
+      protocol: TCP
+  selector:
+    app: bff
+  type: ClusterIP
+  clusterIP: None
+---
